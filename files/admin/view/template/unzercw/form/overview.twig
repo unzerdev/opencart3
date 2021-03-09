@@ -1,0 +1,77 @@
+
+
+{{ header }}{{ column_left }}
+<div id="content">
+	<div class="page-header">
+		<div class="container-fluid">
+			<div class="pull-right input-group">
+				<a href="{{ back | raw }}" data-toggle="tooltip" class="btn btn-default" title="{{ UnzerCw_Translate('Back') }}"><i class="fa fa-reply"></i></a>
+				{% if stores|length > 1 %}
+					<form method="POST"  class="col-sm-8">
+						<select name="storeId"  class="form-control " onchange="this.form.submit()">
+						{% for storeId,storeName in stores %}
+							<option value="{{ storeId }}"
+								{% if storeId == current_store_id %}
+									selected="selected"
+								{% endif %}
+							>
+							{{ storeName }}
+							</option>
+						{% endfor %}
+						</select>
+					</form>
+				{% endif %}
+			</div>
+			<h1>{{ heading_title }}</h1>
+			<ul class="breadcrumb">
+			{%  for breadcrumb in breadcrumbs %}
+            		<li><a href="{{ breadcrumb['href'] | raw }}">{{ breadcrumb['text'] }}</a></li>
+        	{% endfor %}
+      		</ul>
+		</div>
+	</div>
+	<div class="container-fluid">
+	{% if error_warning %}
+    <div class="alert alert-danger">
+			<i class="fa fa-exclamation-circle"></i>{{ error_warning }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+		</div>
+	{% elseif  success %}
+     <div class="alert alert-success">
+			<i class="fa fa-exclamation-circle"></i>{{ success }}
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+		</div>
+    {% endif %}
+    <div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">
+					<i class="fa fa-pencil"></i>{{ heading_title }}</h3>
+			</div>
+			<div class="panel-body backend-form">
+				{% if forms|length > 0 %}
+				<table class="table table-bordered table-hover">
+					<thead>
+						<tr>
+							<td class="left">{{ UnzerCw_Translate('Item') }}</td>
+							<td style="align: right">Action</td>
+						</tr>
+					</thead>
+					<tbody>
+					{% for form in forms %}
+						<tr>
+				            <td class="left">{{ form.getTitle() }}</td>
+				            <td style="align: right">
+				            	<a class="btn btn-primary" 
+				            	href="{{ url.link( module_base_path ~ "/form_view", "user_token=" ~ user_token ~ "&form=" ~ form.getMachineName(), "SSL") }}" 
+				            	title="{{ UnzerCw_Translate('View') }}"><i class="fa fa-eye"></i></a>
+				            </td>
+				          </tr>
+			        {% endfor %}
+				</tbody>
+				</table>
+				{% endif %}
+			</div>
+		</div>
+	</div>
+</div>
+{{ footer }}

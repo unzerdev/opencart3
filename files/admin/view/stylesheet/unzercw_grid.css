@@ -1,0 +1,82 @@
+
+.list .grid-row td{
+	padding: 7px;
+}
+
+.list th {
+	text-decoration: none;
+	color: #222222;
+	font-weight: bold;
+	padding: 7px;
+	background-color: #EFEFEF;
+	border-right: 1px solid #DDDDDD;
+	border-bottom: 1px solid #DDDDDD;
+}
+
+
+
+.ascending {
+	background-image: url("../image/unzercw/down.png");
+	background-repeat: no-repeat;
+	display: inline-block;
+	width: 14px;
+	height: 14px;
+	line-height: 14px;
+}
+
+.descending {
+	background-image: url("../image/unzercw/up.png");
+	display: inline-block;
+	background-repeat: no-repeat;
+	width: 14px;
+	height: 14px;
+	line-height: 14px;
+}
+
+.reset-sorting {
+	background-image: url("../image/unzercw/delete.png");
+	display: inline-block;
+	background-repeat: no-repeat;
+	width: 14px;
+	height: 14px;
+	line-height: 14px;
+}
+
+.no-sorting .reset-sorting {
+	display: none;
+}
+
+.descending-sorting .descending {
+	display: none;
+}
+
+.ascending-sorting .ascending {
+	display: none;
+}
+
+.sorting {
+	float:right;
+}
+
+select.grid-limit {
+	width: 60px;
+	margin-right: -4px;
+}
+
+.grid-limit-box {
+	text-align: right;
+}
+
+.grid .pagination {
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
+.grid-filter-row input, .grid-filter-row select {
+	margin-bottom: 0;
+	width: 95%;
+}
+
+.grid-filter-row {
+	border-bottom-width: 2px;
+}

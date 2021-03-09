@@ -1,0 +1,37 @@
+
+.unzercw-use-default select{
+	color: #CCC;
+	border-color: #CCC;
+}
+
+.unzercw-use-default input{
+	color: #CCC;
+}
+
+table.form.listing > tbody > tr > td:first-child {
+	width: auto;
+	max-width: 300px;
+}
+
+
+table.form > thead > tr > td {
+	padding-left: 10px;
+	font-weight: bold;
+}
+
+.unzercw-line-item-grid input.line-item-quantity {
+	text-align: right;
+}
+
+.unzercw-line-item-grid input.line-item-price-excluding {
+	text-align: right;
+}
+
+.unzercw-line-item-grid input.line-item-price-including {
+	text-align: right;
+}
+
+.closable-box {
+	text-align: right;
+	margin-bottom: 5px;
+}

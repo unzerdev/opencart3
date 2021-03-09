@@ -1,0 +1,39 @@
+<h2>{{ UnzerCw_Translate('Transactions') }}</h2>
+<table class="form">
+	<tr>
+		<th>{{ UnzerCw_Translate('#') }}</th>
+		<th>{{ UnzerCw_Translate('Amount') }}</th>
+		<th>{{ UnzerCw_Translate('Created On') }}</th>
+		<th>{{ UnzerCw_Translate('Is Authorized') }}</th>
+		<th>{{ $transaction->getTransactionObject()('Payment Method') }}</th>
+	</tr>
+
+	{%  for transaction in transactions %}
+	  {% if transaction.getTransactionObject() is not null%}
+		<tr>
+			<td>{{ transaction.getTransactionExternalId() }}</td>
+			<td>{{ transaction.getTransactionObject().getAuthorizationAmount() }}</td>
+			<td>{{ transaction.getCreatedOn().format(Customweb_Core_Util_System::getDefaultDateTimeFormat()) }}</td>
+			<td>{% if transaction.getTransactionObject().isAuthorized() %}
+					{{ UnzerCw_Translate('Yes') }}
+				{%  else %}
+					{{  UnzerCw_Translate('No') }}
+				{%  endif %}
+			</td>
+			<td>{{ transaction.getTransactionObject().getPaymentMethod().getPaymentMethodDisplayName() }}</td>
+		</tr>
+	    {%  else %}
+		<tr>
+			<td>{{ transaction.getTransactionExternalId() }}</td>
+			<td>--</td>
+			<td>{{ transaction.getCreatedOn().format(Customweb_Core_Util_System::getDefaultDateTimeFormat()) }}</td>
+			<td>{{  UnzerCw_Translate('No') }}</td>
+			<td>--</td>
+		</tr>
+		{% endif %}
+	{% endfor %}
+
+</table>
+<br />
+
+

@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<modification>
+	<name>unzercw</name>
+	<version>1.0.0</version>
+	<author>customweb ltd</author>
+
+	<!-- Add menu link to header controller in 2.3 -->
+	<file path="admin/controller/common/column_left.php">
+		<operation>
+			<search><![CDATA[if ($this->user->hasPermission('access', 'sale/recurring')) {]]></search>
+			<add position="before"><![CDATA[
+			
+			if ($this->user->hasPermission('access', 'unzercw/transaction')) {
+				require_once (dirname(DIR_SYSTEM) . '/system/library/cw/UnzerCw/init.php');
+				UnzerCw_Util::setRegistry($this->registry);
+				
+				$sale[] = array(
+					'name'	   => UnzerCw_Language::_('Unzer Transactions'),
+					'href'     => $this->url->link('unzercw/transaction', 'user_token=' . $this->session->data['user_token'], 'SSL'),
+					'children' => array()		
+				);
+			}
+
+			]]></add>
+		</operation>
+	</file>
+
+	<!--The 'route' parameter may be sent via POST. We make here sure OpenCart 
+		receives the parameter. -->
+	<file path="system/engine/action.php">
+		<operation>
+			<search><![CDATA[<?php]]></search>
+			<add position="after"><![CDATA[if (isset($_POST['route']) && !isset($_GET['route'])) { $_GET['route'] = $_POST['route'];}]]></add>
+		</operation>
+	</file>
+
+
+	<file path="admin/controller/sale/order.php">
+		<operation>
+			<search limit="1"><![CDATA['order_id'	       => $order_id,]]></search>
+			<add position="before" offset="2"><![CDATA[
+
+				require_once DIR_SYSTEM . '/library/cw/UnzerCw/init.php';
+				require_once ('UnzerCw/Util.php');
+				require_once ('UnzerCw/Language.php');
+				UnzerCw_Util::setRegistry($this->registry);
+				$unzercw_entities = UnzerCw_Util::getEntityManager()->searchByFilterName('UnzerCw_Entity_Transaction', 'loadByOrderId', array('>orderId' => $order_id));
+				$order_info['unzercw_pi'] = array();
+				if(!empty($unzercw_entities)){
+					foreach($unzercw_entities as $unzercw_transaction_entity) {
+						if(($unzercw_transaction_entity->getAuthorizationStatus() == 'successful' || $unzercw_transaction_entity->getAuthorizationStatus() == 'authorizing') && $unzercw_transaction_entity->getTransactionObject() !== null && $unzercw_transaction_entity->getTransactionObject()->getPaymentInformation() != null) {
+							$order_info['unzercw_pi']['title'] = (String) UnzerCw_Language::_('Payment Information');
+							$order_info['unzercw_pi']['information'] = (String) $unzercw_transaction_entity->getTransactionObject()->getPaymentInformation();
+							break;
+						}
+					}
+				}
+ 			]]></add>
+		</operation>
+		<operation>
+			<search limit="1"><![CDATA['total'            => $total_data,]]></search>
+			<add position="before"><![CDATA[
+			'unzercw_pi' => $order_info['unzercw_pi'],
+ 			]]></add>
+		</operation>
+	</file>
+	
+	<file path="admin/view/template/sale/order_invoice.twig">
+		<operation>
+			<search><![CDATA[{% if order.comment %}]]></search>
+			<add position="before"><![CDATA[
+	  {% if order.unzercw_pi.title is defined %}
+	  <table class="table table-bordered">
+	    <thead>
+	    	<tr>
+	          <td><b>{{ order.unzercw_pi.title }}</b></td>
+	        </tr>
+	    </thead>
+	    <tbody>
+	    	<tr>
+	          <td>{{ order.unzercw_pi.information }}</td>
+	        </tr>
+	    </tbody>
+	  </table>
+	  {% endif %}
+ 			]]></add>
+		</operation>
+	</file>
+
+
+	<file path="catalog/controller/mail/order.php">
+		<operation>
+			<search limit="1"><![CDATA[// Order Totals]]></search>
+			<add position="before"><![CDATA[
+
+			require_once DIR_SYSTEM . '/library/cw/UnzerCw/init.php';
+			require_once ('UnzerCw/Util.php');
+			require_once ('UnzerCw/Language.php');
+			UnzerCw_Util::setRegistry($this->registry);
+			$unzercw_entities = UnzerCw_Util::getEntityManager()->searchByFilterName('UnzerCw_Entity_Transaction', 'loadByOrderId', array('>orderId' => $data['order_id']));
+			if(!empty($unzercw_entities)){
+				foreach($unzercw_entities as $unzercw_transaction_entity) {
+					if(($unzercw_transaction_entity->getAuthorizationStatus() == 'successful' || $unzercw_transaction_entity->getAuthorizationStatus() == 'authorizing') && $unzercw_transaction_entity->getTransactionObject() !== null && $unzercw_transaction_entity->getTransactionObject()->getPaymentInformation() != null) {
+						$data['unzercw_payment_information_title'] = (String) UnzerCw_Language::_('Payment Information');
+						$data['unzercw_payment_information'] = (String) $unzercw_transaction_entity->getTransactionObject()->getPaymentInformation();
+						break;
+					}
+				}
+			}
+ 			]]></add>
+		</operation>
+	</file>
+
+	<file path="catalog/view/theme/*/template/mail/order_add.twig">
+		<operation>
+			<search><![CDATA[<p style="margin-top: 0px; margin-bottom: 20px;">{{ text_footer }}</p>]]></search>
+			<add position="before"><![CDATA[
+		  {% if unzercw_payment_information is defined %}
+		  <table style="border-collapse: collapse; width: 100%; border-top: 1px solid #DDDDDD; border-left: 1px solid #DDDDDD; margin-bottom: 20px;">
+		    <thead>
+		      <tr>
+		        <td style="font-size: 12px; border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; background-color: #EFEFEF; font-weight: bold; text-align: left; padding: 7px; color: #222222;">{{ unzercw_payment_information_title }}</td>
+		      </tr>
+		    </thead>
+		    <tbody>
+		      <tr>
+		        <td style="font-size: 12px;	border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; text-align: left; padding: 7px;">{{ unzercw_payment_information }}</td>
+		      </tr>
+		    </tbody>
+		  </table>
+		  {% endif %}
+ 			]]></add>
+		</operation>
+	</file>
+	
+	<file path="system/library/template/twig.php">
+		<operation>
+			<search limit="1"><![CDATA[$twig = new \Twig\Environment($loader, $config)]]></search>
+			<add position="after"><![CDATA[
+		require_once DIR_SYSTEM . '/library/cw/UnzerCw/init.php';
+		require_once ('UnzerCw/Twig/Extension.php');
+		$twig->addExtension(new \UnzerCw_Twig_Extension());
+ 			]]></add>
+		</operation>
+	</file>
+	
+	<file path="model/catalog/extension/total/coupon.php">
+		<operation>
+			<search limit="1"><![CDATA[foreach ($this->cart->getProducts() as $product) {]]></search>
+			<add position="replace"><![CDATA[
+		require_once DIR_SYSTEM . 'library/cw/init.php';
+		$products = empty($this->cart->getProducts()) ? UnzerCw_Util::getMockCartProducts() : $this->cart->getProducts();
+		foreach ($products as $product) {
+ 			]]></add>
+		</operation>
+	</file>
+</modification>

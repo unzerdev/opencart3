@@ -1,0 +1,65 @@
+
+
+.backend-form fieldset{
+	border: 1px #EEE solid;
+}
+
+.unzercw-controls {
+	display: inline-block;
+}
+
+.backend-form .unzercw-multi-control .unzercw-controls { 
+	display: inline;
+}
+
+.backend-form .unzercw-confirmation-form {
+	text-align: left;
+	margin-top: 10px;
+}
+
+.backend-form .unzercw-control-group {
+	margin-bottom: 15px;
+}
+
+.backend-form .unzercw-control-label {
+	display: inline-block;
+}
+.backend-form .unzercw-control-label .unzercw-required {
+	color: #d80000;
+	font-weight: bold;
+}
+
+.backend-form .unzercw-control-group > .unzercw-controls {
+	vertical-align: top;
+}
+
+.backend-form .unzercw-description {
+	margin-top: 3px;
+}
+
+.backend-form .unzercw-help-block {
+	color: #666;
+	font-size: 11px;
+	font-weight: normal;
+}
+
+.backend-form .unzercw-element-scope {
+	margin-left: 190px;
+}
+
+.backend-form .buttons {
+	margin-top: 5px;	
+}
+
+.unzercw-control-group {
+	border-bottom: 1px dotted #CCCCCC;
+	padding-bottom: 5px;
+}
+
+
+.description-label {
+	display: inline-block;
+	padding: 6px 15px;
+	width: 160px;
+	text-align: left;
+}

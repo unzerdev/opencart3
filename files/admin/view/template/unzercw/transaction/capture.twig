@@ -1,0 +1,102 @@
+{{ header }}{{ column_left }}
+<div id="content">
+	<div class="page-header">
+		<div class="container-fluid">
+			<div class="pull-right">
+				<a href="{{ back | raw }}" data-toggle="tooltip" class="btn btn-default" title="{{ UnzerCw_Translate('Back to Transaction') }}"><i class="fa fa-reply"></i></a>
+			</div>
+			<h1>{{ heading_title }}</h1>
+			<ul class="breadcrumb">
+          	{%  for breadcrumb in breadcrumbs %}
+        		<li><a href="{{ breadcrumb['href'] | raw }}">{{ breadcrumb['text'] }}</a></li>
+        	{% endfor %}
+      		</ul>
+		</div>
+	</div>
+	<div class="container-fluid">
+    {% if error_warning %}
+    <div class="alert alert-danger">
+			<i class="fa fa-exclamation-circle"></i>{{ error_warning }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+		</div>
+   	{% elseif success %}
+     <div class="alert alert-success">
+			<i class="fa fa-exclamation-circle"></i>{{ success }}
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+		</div>
+    {% endif %}
+    <div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">
+					<i class="fa fa-pencil"></i>{{ heading_title }}</h3>
+			</div>
+			<div class="panel-body">
+
+			{% if transaction.getTransactionObject().isPartialCapturePossible() %}
+				<h2>{{ UnzerCw_Translate('Partial Capture') }}</h2>
+				<p>{{ UnzerCw_Translate('With the following form you can perform a partial capture.') }}</p>
+				<form action="{{ captureConfirmUrl | raw }}" method="POST" class="unzercw-line-item-grid " id="capture-form">
+				
+					<input type="hidden" id="unzercw-decimal-places" value="{{ UnzerCw_DecimalPlaces(transaction.getTransactionObject().getCurrencyCode()) }}" />
+					<input type="hidden" id="unzercw-currency-code" value="{{ transaction.getTransactionObject().getCurrencyCode()|upper }}" />
+					<table class="table table-bordered table-hover">
+						<thead>
+							<tr>
+								<td class="left">{{ UnzerCw_Translate('Name') }}</td>
+								<td class="left">{{ UnzerCw_Translate('SKU') }}</td>
+								<td class="left">{{ UnzerCw_Translate('Type') }}</td>
+								<td class="left">{{ UnzerCw_Translate('Tax Rate') }}</td>
+								<td style="text-align: right;">{{ UnzerCw_Translate('Quantity') }}</td>
+								<td style="text-align: right;">{{ UnzerCw_Translate('Total Amount (excl. Tax)') }}</td>
+								<td style="text-align: right;">{{ UnzerCw_Translate('Total Amount (incl. Tax)') }}</td>
+								</tr>
+						</thead>
+					
+						<tbody>
+						{% for index,item in transaction.getTransactionObject().getUncapturedLineItems() %}
+							{% set amountExcludingTax = UnzerCw_FormatAmount(item.getAmountExcludingTax(), transaction.getTransactionObject().getCurrencyCode()) %}
+							{% set amountIncludingTax = UnzerCw_FormatAmount(item.getAmountIncludingTax(), transaction.getTransactionObject().getCurrencyCode()) %}
+							{% if item.getType() == 'discount' %}
+									{% set amountExcludingTax = amountExcludingTax * -1 %}
+									{% set amountIncludingTax = amountIncludingTax * -1 %}
+							{% endif %}
+							
+							<tr id="line-item-row-{{ index }}" class="line-item-row" data-line-item-index="{{ index }}" >
+								<td class="left">{{ item.getName() }}</td>
+								<td class="left">{{ item.getSku() }}</td>
+								<td class="left">{{ item.getType() }}</td>
+								<td class="left">{{ item.getTaxRate() }} %<input type="hidden" class="tax-rate" value="{{ item.getTaxRate() }}" /></td>
+								<td style="text-align: right;"><input type="text" class="line-item-quantity form-control" name="quantity[{{ index}}]" value="{{ item.getQuantity() }}" /></td>
+								<td style="text-align: right;"><input type="text" class="line-item-price-excluding form-control" name="price_excluding[{{ index}}]" value="{{ amountExcludingTax }}" /></td>
+								<td style="text-align: right;"><input type="text" class="line-item-price-including form-control" name="price_including[{{ index}}]" value="{{ amountIncludingTax }}" /></td>
+							</tr>
+						{% endfor %}
+						</tbody>
+						<tfoot>
+							<tr>
+								<td colspan="6" style="text-align: right;">{{ UnzerCw_Translate('Total Capture Amount') }}:</td>
+								<td id="line-item-total" style="text-align: right;">
+								{{ UnzerCw_FormatAmount(transaction.getTransactionObject().getCapturableAmount(), transaction.getTransactionObject().getCurrencyCode()) }} 
+								{{ transaction.getTransactionObject().getCurrencyCode()|upper}}
+							</tr>
+						</tfoot>
+					</table>
+					{% if transaction.getTransactionObject().isCaptureClosable() %}
+						<div class="closable-box">
+							<label>
+								<input id="close-transaction" type="checkbox" name="close" value="on" />{{ UnzerCw_Translate('Close transaction for further captures') }}
+							</label>
+							
+						</div>
+					{% endif %}
+				
+					<div style="text-align: right;">
+						<input type="submit" class="btn btn-success" value="{{ UnzerCw_Translate('Capture') }}" />
+					</div>
+				</form>
+			{% endif %}
+			</div>
+		</div>
+	</div>
+</div>
+{{ footer }}
