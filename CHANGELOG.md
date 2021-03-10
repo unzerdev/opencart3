@@ -8,4 +8,4 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 ### Changed
 * Initial release
 
-[1.0.54]: https://github.com/unzerdev/prestashop1.7/tree/1.0.54
+[1.0.54]: https://github.com/unzerdev/opencart3/tree/1.0.54
